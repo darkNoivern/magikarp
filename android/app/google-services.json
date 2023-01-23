@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "902087210515",
+    "project_id": "magikarp-909b3",
+    "storage_bucket": "magikarp-909b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:902087210515:android:df733288bf5d9297dc31e6",
+        "android_client_info": {
+          "package_name": "com.example.magikarp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "902087210515-4f8ah1egasrsof7jrapnon1tedddmvtn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfOJ_maDiQrsErHJMPL6rYCkNm-VqYeRE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "902087210515-4f8ah1egasrsof7jrapnon1tedddmvtn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
