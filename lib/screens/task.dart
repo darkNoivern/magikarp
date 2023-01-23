@@ -1,3 +1,6 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:cherry_toast/resources/arrays.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -50,8 +53,6 @@ class _TaskMasterState extends State<TaskMaster> {
                   padding: const EdgeInsets.only(
                       left: 8.0, right: 8.0, top: 16.0, bottom: 32.0),
                   child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      // crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -119,7 +120,6 @@ class _TaskMasterState extends State<TaskMaster> {
                             Expanded(
                                 child: InkWell(
                               onTap: () {
-                                // addTasks();
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(FirebaseAuth.instance.currentUser?.uid
@@ -133,6 +133,23 @@ class _TaskMasterState extends State<TaskMaster> {
                                     }
                                   ])
                                 });
+
+                                final snackBar = SnackBar(
+                                  /// need to set following properties for best effect of awesome_snackbar_content
+                                  elevation: 0,
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.transparent,
+                                  content: AwesomeSnackbarContent(
+                                    title: 'Hi User!',
+                                    message: 'Task added successfully',
+                                    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                    contentType: ContentType.help,
+                                  ),
+                                );
+
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar()
+                                  ..showSnackBar(snackBar);
 
                                 _taskController.clear();
 
@@ -231,7 +248,7 @@ class _TaskMasterState extends State<TaskMaster> {
                                                         .spaceBetween,
                                                 children: [
                                                   Text(
-                                                    'Task $index',
+                                                    'Task ${index+1}',
                                                     // 'Task',
                                                     style: TextStyle(
                                                         fontFamily:
@@ -249,7 +266,27 @@ class _TaskMasterState extends State<TaskMaster> {
                                                             .collection('users')
                                                             .doc(FirebaseAuth.instance.currentUser?.uid.toString())
                                                             .update({'tasksCompleted': FieldValue.increment(1)});
-                                                        },
+
+
+                                                        final snackBar = SnackBar(
+                                                          /// need to set following properties for best effect of awesome_snackbar_content
+                                                          elevation: 0,
+                                                          behavior: SnackBarBehavior.floating,
+                                                          backgroundColor: Colors.transparent,
+                                                          content: AwesomeSnackbarContent(
+                                                            title: 'Congratulations!',
+                                                            message: 'Task completed successfully',
+                                                            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                            contentType: ContentType.success,
+                                                          ),
+                                                        );
+
+                                                        ScaffoldMessenger.of(context)
+                                                          ..hideCurrentSnackBar()
+                                                          ..showSnackBar(snackBar);
+
+
+                                                      },
                                                       child:
                                                           Icon(Icons.task_alt)),
                                                 ],

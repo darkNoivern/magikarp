@@ -39,7 +39,7 @@ class _WrapperState extends State<Wrapper> {
                       // debugPrint(error);
                     });
                   },
-                  child: Text('Logout', style: TextStyle(fontFamily: 'Ubuntu_300'),),
+                  child: Text('Logout', style: TextStyle(fontFamily: 'Ubuntu_300', fontSize: 16),),
                 )
               ],
             ),

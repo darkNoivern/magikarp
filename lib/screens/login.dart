@@ -1,7 +1,9 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:cherry_toast/resources/arrays.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ftoast/ftoast.dart';
-import 'package:magikarp/services/auth.dart';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -21,24 +23,59 @@ class _LoginState extends State<Login> {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool _loading = false;
+  bool _see = false;
 
   final Stream<QuerySnapshot> _usersRefStream =
       FirebaseFirestore.instance.collection('users').snapshots();
 
-  void login() {
+  void login() async {
+
     setState(() {
       _loading = true;
     });
-    _auth
-        .signInWithEmailAndPassword(
-            email: _emailController.text.toString(),
-            password: _passwordController.text.toString())
-        .then((value) => {
-              // db.collection("cities").doc("new-city-id").set({"name": "Chicago"});
-            })
-        .onError((error, stackTrace) => {
-              // debugPrint(error);
-            });
+    try {
+      await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.toString(),
+          password: _passwordController.text.toString()
+      );
+
+      final snackBar = await SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Congratulations!',
+          message: 'LoggedIn Successfully',
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.success,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+
+    }
+    catch(error){
+        final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Snap!',
+          message: '$error',
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
+    }
+
 
     setState(() {
       _loading = false;
@@ -47,32 +84,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference usersRef =
-        FirebaseFirestore.instance.collection('users');
-
-    // Future<void> addUser(result) {
-    //   debugPrint(result);
-    //   FToast.toast(
-    //     context,
-    //     duration: 2000,
-    //     msg: "I'm FToast: ${result.toString()}",
-    //     msgStyle: TextStyle(color: Colors.white),
-    //   );
-    //
-    //   return
-    //       .then((value) => FToast.toast(
-    //             context,
-    //             duration: 2000,
-    //             msg: "I'm FToast: ${result.toString()}",
-    //             msgStyle: TextStyle(color: Colors.white),
-    //           ))
-    //       .catchError((error) => FToast.toast(
-    //             context,
-    //             duration: 2000,
-    //             msg: "I'm Eoast: ${result.toString()}",
-    //             msgStyle: TextStyle(color: Colors.white),
-    //           ));
-    // }
+    CollectionReference usersRef = FirebaseFirestore.instance.collection('users');
 
     void signup() async {
       setState(() {
@@ -85,6 +97,23 @@ class _LoginState extends State<Login> {
           password: _passwordController.text.toString(),
         );
 
+        final snackBar = await SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Congratulations!',
+            message: 'Registered Successfully',
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.success,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
         await usersRef.doc(user.user?.uid).set({
           'username': _usernameController.text.toString(),
           'uid': user.user?.uid,
@@ -95,16 +124,30 @@ class _LoginState extends State<Login> {
         print("Successfully created new user: ${user.toString()}");
 
       } catch (error) {
+
+        _emailController.clear();
+        _passwordController.clear();
+
+        final snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'Snap!',
+            message: '$error',
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
         print("Error creating new user: ${error.toString()}");
       }
 
-      // _auth
-      //     .createUserWithEmailAndPassword(
-      //     email: _emailController.text.toString(),
-      //     password: _passwordController.text.toString())
-      //     .then((value) => addUser(value))
-      //     .onError((error, stackTrace) => {
-      // });
       setState(() {
         _loading = false;
       });
@@ -131,7 +174,7 @@ class _LoginState extends State<Login> {
             child: Scaffold(
                 body: SingleChildScrollView(
                     child: Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 108.0),
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 128.0),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -211,54 +254,8 @@ class _LoginState extends State<Login> {
                         )),
                       ],
                     ),
-                    if (_login == false)
-                      SizedBox(
-                        height: 16.0,
-                      ),
-                    if (_login == false)
-                      TextField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            hintText: 'hellFrost',
-                            hintStyle: TextStyle(
-                                color: Colors.grey, fontFamily: 'Ubuntu_300'),
-                            labelText: 'Username',
-                            labelStyle: TextStyle(fontFamily: 'Ubuntu_400'),
-                            floatingLabelBehavior: FloatingLabelBehavior.always,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF212529)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8.0)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF212529)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8.0)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color(0xFF212529), width: 2.0),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8.0)),
-                            ),
-                            prefixIcon: Icon(
-                              Icons.supervised_user_circle,
-                              color: Color(0xFF212529),
-                            ),
-                          ),
-                          textAlign: TextAlign.left,
-                          keyboardType: TextInputType.text,
-
-                          // keyboardAppearance: ,
-                          style: TextStyle(
-                            fontFamily: 'Ubuntu_300',
-                            fontSize: 16.0,
-                          ),
-                          onSubmitted: (value) {
-                            // getData();
-                          }),
                     SizedBox(
-                      height: 16.0,
+                      height: 32.0,
                     ),
                     TextField(
                         controller: _emailController,
@@ -305,6 +302,7 @@ class _LoginState extends State<Login> {
                       height: 16.0,
                     ),
                     TextField(
+                      obscureText: !_see,
                         controller: _passwordController,
                         decoration: InputDecoration(
                           hintText: '************',
@@ -333,6 +331,18 @@ class _LoginState extends State<Login> {
                             Icons.lock_open_rounded,
                             color: Color(0xFF212529),
                           ),
+                          suffixIcon: InkWell(
+                            onTap: (){
+                              setState(() {
+                                bool currSee = _see;
+                                _see = !currSee;
+                              });
+                            },
+                            child: Icon(
+                              _see ? Icons.close : Icons.remove_red_eye_rounded,
+                              color: Color(0xFF212529),
+                            ),
+                          )
                         ),
                         textAlign: TextAlign.left,
                         keyboardType: TextInputType.text,
@@ -368,12 +378,8 @@ class _LoginState extends State<Login> {
                               ),
                               height: 56,
                               child: Center(
-                                  child: Text(
-                                _loading ? 'Loading' : 'Sign-Up',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Ubuntu_400'),
-                              )),
+                                  child: _loading ? CircularProgressIndicator(color: Colors.white,) : Text('Sign-Up', style: TextStyle(color: Colors.white, fontFamily: 'Ubuntu_400'),)
+          ),
                             ),
                           )),
                         ],
@@ -398,12 +404,8 @@ class _LoginState extends State<Login> {
                               ),
                               height: 56,
                               child: Center(
-                                  child: Text(
-                                _loading ? 'Loading' : 'Login',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Ubuntu_400'),
-                              )),
+                                  child: _loading ? CircularProgressIndicator(color: Colors.white,) : Text('Login', style: TextStyle(color: Colors.white, fontFamily: 'Ubuntu_400'),)
+                              ),
                             ),
                           )),
                         ],
